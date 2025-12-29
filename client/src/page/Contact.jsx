@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { useEffectOnce, useLocalStorage } from "react-use";
+import { useLocalStorage } from "react-use";
 import {
   ContactDeleteEndpoint,
   ContactListEndpoint,
@@ -9,6 +9,7 @@ import { alertConfirm, alertError, alertSuccess } from "../lib/alert";
 import { Link } from "react-router";
 import CardContact from "../components/Contact/CardContact";
 import SearchContact from "../components/Contact/SearchContact";
+import PaginationContact from "../components/Contact/PaginationContact";
 
 export default function Contact() {
   const [token, _] = useLocalStorage("token", "");
@@ -50,14 +51,6 @@ export default function Contact() {
     setSearchParams(searchData);
   }
 
-  function getPages() {
-    const pages = [];
-    for (let i = 1; i <= page.totalPage; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }
-
   async function handlePageChange(page) {
     setPage((prev) => ({
       ...prev,
@@ -86,43 +79,6 @@ export default function Contact() {
     fetchContact().then(() => console.log("Contact Fetched"));
   }, [page.currentPage, searchParams]);
 
-  useEffectOnce(() => {
-    const toggleButton = document.getElementById("toggleSearchForm");
-    const searchFormContent = document.getElementById("searchFormContent");
-    const toggleIcon = document.getElementById("toggleSearchIcon");
-
-    searchFormContent.style.transition =
-      "max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out";
-    searchFormContent.style.overflow = "hidden";
-    searchFormContent.style.maxHeight = "0px";
-    searchFormContent.style.opacity = "0";
-    searchFormContent.style.marginTop = "0";
-
-    function toggleSearchForm() {
-      if (searchFormContent.style.maxHeight !== "0px") {
-        // Hide the form
-        searchFormContent.style.maxHeight = "0px";
-        searchFormContent.style.opacity = "0";
-        searchFormContent.style.marginTop = "0";
-        toggleIcon.classList.remove("fa-chevron-up");
-        toggleIcon.classList.add("fa-chevron-down");
-      } else {
-        // Show the form
-        searchFormContent.style.maxHeight =
-          searchFormContent.scrollHeight + "px";
-        searchFormContent.style.opacity = "1";
-        searchFormContent.style.marginTop = "1rem";
-        toggleIcon.classList.remove("fa-chevron-down");
-        toggleIcon.classList.add("fa-chevron-up");
-      }
-    }
-
-    toggleButton.addEventListener("click", toggleSearchForm);
-
-    return () => {
-      toggleButton.removeEventListener("click", toggleSearchForm);
-    };
-  });
   return (
     <main className="container mx-auto px-4 py-8 flex-grow">
       <div className="flex items-center mb-6">
@@ -175,60 +131,7 @@ export default function Contact() {
           />
         ))}
       </div>
-
-      {/* Pagination */}
-      <div className="mt-10 flex justify-center">
-        <nav className="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in">
-          {page.currentPage > 1 && (
-            <a
-              href="#"
-              onClick={() => handlePageChange(page.currentPage - 1)}
-              className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
-            >
-              <i className="fas fa-chevron-left mr-2" /> Previous
-            </a>
-          )}
-          {getPages().map((currPage) => {
-            if (currPage === page.currentPage) {
-              return (
-                <a
-                  key={currPage}
-                  href="#"
-                  onClick={() => handlePageChange(currPage)}
-                  className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md"
-                >
-                  {currPage}
-                </a>
-              );
-            } else {
-              return (
-                <a
-                  key={currPage}
-                  href="#"
-                  onClick={() => handlePageChange(currPage)}
-                  className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
-                >
-                  {currPage}
-                </a>
-              );
-            }
-          })}
-
-          {page.currentPage < page.totalPage && (
-            <a
-              href="#"
-              onClick={() => handlePageChange(page.currentPage + 1)}
-              className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
-            >
-              Next <i className="fas fa-chevron-right ml-2" />
-            </a>
-          )}
-        </nav>
-      </div>
-      {/* Footer */}
-      <div className="mt-10 mb-6 text-center text-gray-400 text-sm animate-fade-in">
-        <p>© 2025 Contact Management. All rights reserved.</p>
-      </div>
+      <PaginationContact page={page} onPageChange={handlePageChange}/>
     </main>
   );
 }
