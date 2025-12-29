@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { LoginEndpoint } from "../lib/api/UserApi";
 import { useLocalStorage } from "react-use";
-import { alertError, alertSuccess } from "../lib/alert";
+import { alertError } from "../lib/alert";
 
 export default function Login() {
   const [form, setForm] = useState({

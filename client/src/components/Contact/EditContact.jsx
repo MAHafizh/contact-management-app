@@ -1,59 +1,26 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { ContactCreateEndpoint } from "../../lib/api/ContactApi";
-import { useLocalStorage } from "react-use";
-import { alertError, alertSuccess } from "../../lib/alert";
+import React from "react";
 
-export default function CreateContact() {
-  const [token, _] = useLocalStorage("token", "");
-  const navigate = useNavigate();
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
-
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const response = await ContactCreateEndpoint(token, form);
-    const responseBody = await response.json();
-
-    if (response.status === 200) {
-      await alertSuccess("Contact Created Successfully");
-      navigate({
-        pathname: "/dashboard/contacts",
-      });
-    } else {
-      await alertError(responseBody.errors);
-    }
-  }
-
+export default function EditContact() {
   return (
-    <div className="container mx-auto px-4 py-8 flex-grow">
+    <main className="container mx-auto px-4 py-8 flex-grow">
       <div className="flex items-center mb-6">
-        <Link
-          to="/dashboard/contacts"
+        <a
+          href="dashboard.html"
           className="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
         >
           <i className="fas fa-arrow-left mr-2" /> Back to Contacts
-        </Link>
+        </a>
         <h1 className="text-2xl font-bold text-white flex items-center">
-          <i className="fas fa-user-plus text-blue-400 mr-3" /> Create New
-          Contact
+          <i className="fas fa-user-edit text-blue-400 mr-3" /> Edit Contact
         </h1>
       </div>
       <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in">
         <div className="p-8">
-          <form onSubmit={handleSubmit}>
+          <form>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <div>
                 <label
-                  htmlFor="firstName"
+                  htmlFor="first_name"
                   className="block text-gray-300 text-sm font-medium mb-2"
                 >
                   First Name
@@ -64,19 +31,18 @@ export default function CreateContact() {
                   </div>
                   <input
                     type="text"
-                    id="firstName"
-                    name="firstName"
+                    id="first_name"
+                    name="first_name"
                     className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     placeholder="Enter first name"
+                    defaultValue="John"
                     required
-                    value={form.firstName}
-                    onChange={handleChange}
                   />
                 </div>
               </div>
               <div>
                 <label
-                  htmlFor="lastName"
+                  htmlFor="last_name"
                   className="block text-gray-300 text-sm font-medium mb-2"
                 >
                   Last Name
@@ -87,13 +53,12 @@ export default function CreateContact() {
                   </div>
                   <input
                     type="text"
-                    id="lastName"
-                    name="lastName"
+                    id="last_name"
+                    name="last_name"
                     className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     placeholder="Enter last name"
+                    defaultValue="Doe"
                     required
-                    value={form.lastName}
-                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -115,9 +80,8 @@ export default function CreateContact() {
                   name="email"
                   className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter email address"
+                  defaultValue="john.doe@example.com"
                   required
-                  value={form.email}
-                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -138,9 +102,8 @@ export default function CreateContact() {
                   name="phone"
                   className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter phone number"
+                  defaultValue="+1 (555) 123-4567"
                   required
-                  value={form.phone}
-                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -155,12 +118,16 @@ export default function CreateContact() {
                 type="submit"
                 className="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center"
               >
-                <i className="fas fa-plus-circle mr-2" /> Create Contact
+                <i className="fas fa-save mr-2" /> Save Changes
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+      {/* Footer */}
+      <div className="mt-10 mb-6 text-center text-gray-400 text-sm animate-fade-in">
+        <p>© 2025 Contact Management. All rights reserved.</p>
+      </div>
+    </main>
   );
 }

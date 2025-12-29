@@ -6,6 +6,9 @@ import Register from "./page/Register";
 import Login from "./page/Login";
 import DashboardLayout from "./components/Layout/DashboardLayout";
 import UserProfile from "./page/UserProfile";
+import Contact from "./page/Contact";
+import CreateContact from "./components/Contact/CreateContact";
+import EditContact from "./components/Contact/EditContact";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -15,9 +18,18 @@ createRoot(document.getElementById("root")).render(
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Route>
-        <Route path="/dashboard" element={<DashboardLayout/>}>
-          <Route path="contacts" element={<div>Contacts</div>} />
-          <Route path="users/profile" element={<UserProfile/>} />
+
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="users">
+            <Route index element={<></>} />
+            <Route path="profile" element={<UserProfile />} />
+          </Route>
+
+          <Route path="contacts">
+            <Route index element={<Contact />} />
+            <Route path="create" element={<CreateContact/>} />
+            <Route path="edit/:id" element={<EditContact/>} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
