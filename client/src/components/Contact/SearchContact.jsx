@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 
-export default function SearchContact({onChange, name, email, phone, onSubmit}) {
+export default function SearchContact({ onSubmit }) {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    console.log(form)
+    onSubmit(form);
+  }
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div>
           <label
@@ -21,7 +37,8 @@ export default function SearchContact({onChange, name, email, phone, onSubmit}) 
               name="name"
               className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               placeholder="Search by name"
-              value={name} onChange={onChange}
+              value={form.name}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -42,7 +59,8 @@ export default function SearchContact({onChange, name, email, phone, onSubmit}) 
               name="email"
               className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               placeholder="Search by email"
-              value={email} onChange={onChange}
+              value={form.email}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -63,7 +81,8 @@ export default function SearchContact({onChange, name, email, phone, onSubmit}) 
               name="phone"
               className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               placeholder="Search by phone"
-              value={phone} onChange={onChange}
+              value={form.phone}
+              onChange={handleChange}
             />
           </div>
         </div>

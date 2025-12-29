@@ -11,26 +11,19 @@ import CardContact from "../components/Contact/CardContact";
 import SearchContact from "../components/Contact/SearchContact";
 
 export default function Contact() {
-  // const [reload, setReload] = useState(false);
   const [token, _] = useLocalStorage("token", "");
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
   const [page, setPage] = useState({
     currentPage: 1,
     totalPage: 1,
   });
   const [contacts, setContacts] = useState([]);
+  const [searchParams, setSearchParams] = useState({});
 
   async function fetchContact() {
     try {
       const response = await ContactListEndpoint(token, {
         page: page.currentPage,
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
+        ...searchParams,
       });
       const responseBody = await response.json();
       console.log(responseBody);
@@ -49,18 +42,12 @@ export default function Contact() {
     }
   }
 
-  function handleChangeSearch(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  async function handleSearchContact(e) {
-    e.preventDefault();
-    await fetchContact();
+  async function handleSearchContact(searchData) {
     setPage((prev) => ({
       ...prev,
       currentPage: 1,
     }));
-    // setReload(!reload);
+    setSearchParams(searchData);
   }
 
   function getPages() {
@@ -76,8 +63,6 @@ export default function Contact() {
       ...prev,
       currentPage: page,
     }));
-    await fetchContact();
-    // setReload(!reload);
   }
 
   async function handleContactDelete(id) {
@@ -99,7 +84,7 @@ export default function Contact() {
 
   useEffect(() => {
     fetchContact().then(() => console.log("Contact Fetched"));
-  }, [page.currentPage, form]);
+  }, [page.currentPage, searchParams]);
 
   useEffectOnce(() => {
     const toggleButton = document.getElementById("toggleSearchForm");
@@ -162,13 +147,7 @@ export default function Contact() {
           </button>
         </div>
         <div id="searchFormContent" className="mt-4">
-          <SearchContact
-            onChange={handleChangeSearch}
-            onSubmit={handleSearchContact}
-            name={form.name}
-            email={form.email}
-            phone={form.phone}
-          />
+          <SearchContact onSubmit={handleSearchContact} />
         </div>
       </div>
       {/* Contact cards grid */}
@@ -192,7 +171,7 @@ export default function Contact() {
           <CardContact
             key={contact.id}
             contact={contact}
-            onDelete={()=>handleContactDelete(contact.id)}
+            onDelete={() => handleContactDelete(contact.id)}
           />
         ))}
       </div>
