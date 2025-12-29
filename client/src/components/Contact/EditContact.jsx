@@ -1,6 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
+import { useEffectOnce, useLocalStorage } from "react-use";
+import {
+  ContactDetailEndpoint,
+  ContactUpdateEndpoint,
+} from "../../lib/api/ContactApi";
+import { alertSuccess, alertError } from "../../lib/alert";
 
 export default function EditContact() {
+  const params = useParams();
+  const navigate = useNavigate();
+  const id = Number(params.id);
+  const [token, _] = useLocalStorage("token", "");
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
+  async function fetchContactDetail() {
+    try {
+      const response = await ContactDetailEndpoint(token, id);
+      const responseBody = await response.json();
+
+      if (response.status === 200) {
+        setForm({
+          firstName: responseBody.data.first_name,
+          lastName: responseBody.data.last_name,
+          email: responseBody.data.email,
+          phone: responseBody.data.phone,
+        });
+      } else {
+        await alertError(responseBody.errors);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      const response = await ContactUpdateEndpoint(token, id, form);
+      const responseBody = await response.json();
+      console.log(responseBody);
+
+      if (response.status === 200) {
+        await alertSuccess("Contact Updated Successfully");
+        navigate({
+          pathname: "/dashboard/contacts",
+        });
+      } else {
+        await alertError(responseBody.errors);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffectOnce(() => {
+    fetchContactDetail();
+  });
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
   return (
     <main className="container mx-auto px-4 py-8 flex-grow">
       <div className="flex items-center mb-6">
@@ -16,11 +82,11 @@ export default function EditContact() {
       </div>
       <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in">
         <div className="p-8">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <div>
                 <label
-                  htmlFor="first_name"
+                  htmlFor="firstName"
                   className="block text-gray-300 text-sm font-medium mb-2"
                 >
                   First Name
@@ -31,18 +97,19 @@ export default function EditContact() {
                   </div>
                   <input
                     type="text"
-                    id="first_name"
-                    name="first_name"
+                    id="firstName"
+                    name="firstName"
                     className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     placeholder="Enter first name"
-                    defaultValue="John"
                     required
+                    value={form.firstName}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
               <div>
                 <label
-                  htmlFor="last_name"
+                  htmlFor="lastName"
                   className="block text-gray-300 text-sm font-medium mb-2"
                 >
                   Last Name
@@ -53,12 +120,13 @@ export default function EditContact() {
                   </div>
                   <input
                     type="text"
-                    id="last_name"
-                    name="last_name"
+                    id="lastName"
+                    name="lastName"
                     className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     placeholder="Enter last name"
-                    defaultValue="Doe"
                     required
+                    value={form.lastName}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -80,8 +148,9 @@ export default function EditContact() {
                   name="email"
                   className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter email address"
-                  defaultValue="john.doe@example.com"
                   required
+                  value={form.email}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -102,18 +171,19 @@ export default function EditContact() {
                   name="phone"
                   className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter phone number"
-                  defaultValue="+1 (555) 123-4567"
                   required
+                  value={form.phone}
+                  onChange={handleChange}
                 />
               </div>
             </div>
             <div className="flex justify-end space-x-4">
-              <a
-                href="dashboard.html"
+              <Link
+                to="/dashboard/contacts"
                 className="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
               >
                 <i className="fas fa-times mr-2" /> Cancel
-              </a>
+              </Link>
               <button
                 type="submit"
                 className="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center"
@@ -123,10 +193,6 @@ export default function EditContact() {
             </div>
           </form>
         </div>
-      </div>
-      {/* Footer */}
-      <div className="mt-10 mb-6 text-center text-gray-400 text-sm animate-fade-in">
-        <p>© 2025 Contact Management. All rights reserved.</p>
       </div>
     </main>
   );
