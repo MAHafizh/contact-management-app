@@ -5,8 +5,8 @@ export default function CardContact({ contact, onDelete }) {
   return (
     <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
       <div className="p-6">
-        <a
-          href="detail_contact.html"
+        <Link
+          to={`/dashboard/contacts/detail/${contact.id}`}
           className="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
         >
           <div className="flex items-center mb-3">
@@ -39,7 +39,7 @@ export default function CardContact({ contact, onDelete }) {
               <span>{contact.phone}</span>
             </p>
           </div>
-        </a>
+        </Link>
         <div className="mt-4 flex justify-end space-x-3">
           <Link
             to={`/dashboard/contacts/edit/${contact.id}`}
